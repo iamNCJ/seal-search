@@ -1,0 +1,22 @@
+{
+  "name": "seal-search",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "node app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/welai/seal-search.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/welai/seal-search/issues"
+  },
+  "homepage": "https://github.com/welai/seal-search#readme",
+  "devDependencies": {
+    "express": "^4.17.1",
+    "url-join": "^4.0.1"
+  }
+}
