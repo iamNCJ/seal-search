@@ -10,9 +10,31 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
 </head>
 <body>
-  <a id="but" class="waves-effect waves-light btn" onclick="hahaha()">button</a>
+  <a id="but" class="waves-effect waves-light btn" onclick = "search_seal();">button</a>
+  <a id="">
 </body>
 <script>
+    function search_seal() {
+      var txt = '1';
+      $.ajax({
+        url:'/query',
+        type:'GET',
+        contentType: "application/json;charset=UTF-8",
+        data:{name:txt},
+        dataType:'json',
+        success:function (data) {
+            alert('传输成功');
+            $('#but').text(data);
+            // $('.div01').html(result.tips)
+        },
+        error:function (msg) {
+            alert('系统发生错误');
+            // $('#but').text('wrong');
+            console.log(msg.status);
+            console.log(msg.responseText);
+        }
+      })
+    }
   function hahaha() {
     $.get('hello').then(function(data) {
       $('#but').text(data);
