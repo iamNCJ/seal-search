@@ -4,41 +4,197 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <title>Document</title>
+  <title>seal_search</title>
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.8/js/materialize.js"></script>
 </head>
-<body>
-  <a id="but" class="waves-effect waves-light btn" onclick = "search_seal();">button</a>
-  <a id="">
+<body>    
+  <nav class="pink" role="navigation">
+      <div class="nav-wrapper container"><a id="logo-container" class="brand-logo">NextLab</a>
+        <ul class="right hide-on-med-and-down">
+          <li><a href="#">Navbar Link</a></li>
+        </ul>
+      </div>
+    </nav>
+  <section class="container">
+    <br><br>
+    <div class="row">
+      <div class="input-field col s6 offset-s3">
+        <input placeholder="此处键入单字以搜索" id="keyword" type="text" class="validate" onkeydown="if(event.keyCode === 13) search_seal()">
+      </div>
+      <a id="but" class="waves-effect waves-light btn" onclick = "search_seal();"><i class="material-icons">search</i></a>
+    </div>
+  </section>
+
+
+  <div id="img-container" class="container row" style="padding-left: 30px;"></div>
+  <br><br>
+
+  <div id="modal-container"></div>
+
+   <footer class="page-footer pink">     
+      <div class="container">
+        <div class="row">
+          <div class="col l6 s12">
+            <h5 class="white-text">NextLab</h5>
+            <p class="grey-text text-lighten-4">We are a team of college students working on this project like it's our full time job. Any amount would help support and continue development on this project and is greatly appreciated.</p>
+  
+  
+          </div>
+          <div class="col l3 s12">
+            <h5 class="white-text">Settings</h5>
+            <ul>
+              <li><a class="white-text" href="#!">Link 1</a></li>
+              <li><a class="white-text" href="#!">Link 2</a></li>
+              <li><a class="white-text" href="#!">Link 3</a></li>
+              <li><a class="white-text" href="#!">Link 4</a></li>
+            </ul>
+          </div>
+          <div class="col l3 s12">
+            <h5 class="white-text">Connect</h5>
+            <ul>
+              <li><a class="white-text" href="#!">Link 1</a></li>
+              <li><a class="white-text" href="#!">Link 2</a></li>
+              <li><a class="white-text" href="#!">Link 3</a></li>
+              <li><a class="white-text" href="#!">Link 4</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="footer-copyright">
+        <div class="container">
+          Made by <a class="pink-text text-lighten-3" href="http://materializecss.com">Materialize</a>
+        </div>
+      </div>
+    </footer>
 </body>
 <script>
-    function search_seal() {
-      var txt = '1';
-      $.ajax({
-        url:'/query',
-        type:'GET',
-        contentType: "application/json;charset=UTF-8",
-        data:{name:txt},
-        dataType:'json',
-        success:function (data) {
-            alert('传输成功');
-            $('#but').text(data);
-            // $('.div01').html(result.tips)
-        },
-        error:function (msg) {
-            alert('系统发生错误');
-            // $('#but').text('wrong');
-            console.log(msg.status);
-            console.log(msg.responseText);
-        }
-      })
+  function append_modal(cnt, path_img, neighbors) {
+    var neighbors_imgs = "";
+    for(var i = 0;i < neighbors.length;i++)
+      neighbors_imgs += `<img class="card-img" src="${neighbors[i]}" alt="图像无法加载">`;
+    $("#modal-container").append(
+      `<div id="modal-${cnt}" class="modal modal-fixed-footer">
+        <div class="modal-content">
+          <img class="card-img" src="${path_img}" alt="图象无法加载">
+          ${neighbors_imgs}
+        </div>
+        <div class="modal-footer">
+          <a href="#!" class="modal-action modal-close waves-effect waves-green btn-flat ">关闭</a>
+        </div>
+      </div>`);
+  }
+  function append_card(cnt, path_img) {
+    $("#img-container").append(
+      `<div class="box">
+        <a class="modal-trigger" href="#modal-${cnt}">
+          <img class="card-img" src="${path_img}" alt="图象无法加载">
+        </a>
+        <!--img class="materialboxed card-img" src="${path_img}" alt="图象无法加载"-->
+        <!--<div class="card-text">吱吱吱吱吱吱</div>-->
+      </div>`);
+  }
+  function append_progress_bar() {
+    $("#img-container").append(
+      ` <div class="preloader-wrapper big active">
+          <div class="spinner-layer spinner-blue-only">
+            <div class="circle-clipper left">
+              <div class="circle"></div>
+            </div><div class="gap-patch">
+              <div class="circle"></div>
+            </div><div class="circle-clipper right">
+              <div class="circle"></div>
+            </div>
+          </div>
+        </div>
+      `);
+  }
+
+  function search_seal() {
+    // clear the document
+    $("#modal-container").empty();
+    $("#img-container").empty();
+
+    // avoid SQL injection
+    if($("#keyword").val().length !== 1 || $("#keyword").val() === '\''){
+      Materialize.toast('键入一个汉字!', 500);
+      return;
     }
-  function hahaha() {
-    $.get('hello').then(function(data) {
-      $('#but').text(data);
+
+    // query images and show them
+    append_progress_bar();
+    $.get("/query", {"keyword":$("#keyword").val()}, function(res){
+      $("#img-container").empty();
+      var cnt = 0;
+      for(let key in res)
+      {
+        var origin = res[key]["origin"] + "/";
+        var path_img = "resources/" + origin + res[key]["filename"];
+        var neighbors = res[key]["neighbors"].replace("\r", "").split("#");
+        neighbors = neighbors.map(function(item){return "resources/" + origin + item});
+        append_card(cnt, path_img);
+        append_modal(cnt, path_img, neighbors);
+        cnt++;
+      }
+
+      // activate the modals
+      for(var i = 0;i < cnt;i++)
+        $(`#modal-${i}`).modal();
     });
   }
 </script>
+
+<style>
+html, body {
+  height: 100%;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+}
+footer {
+  margin-top: auto;
+}
+
+#img-container {
+  column-count: 8;
+  column-gap: 8px;
+}
+
+#but {
+  margin: 14px 0;
+}
+
+.box {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 10px;
+  margin: 5px;
+  width: 100%;
+  height: auto;
+  font-size: 20px;
+  color: #686868;
+  box-sizing: border-box;
+  border-radius: 10px;
+  /* border: 1px solid #ccc; */
+  box-shadow: 0 0 4px #999;
+  transition: all 500ms;
+}
+
+.box:first-child {
+  margin-top: 0;
+}
+
+.box .card-img {
+  width: 100%;
+}
+
+.box:hover {
+  box-shadow: 0 0 10px #999;
+  /* transform: scale(1.2); */
+}
+</style>
 </html>

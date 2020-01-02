@@ -11,37 +11,37 @@ const fullURL = path => urlJoin(baseURL, path);
 app.use(baseURL, express.static('public'));
 app.use(fullURL('/resources'), express.static('static'));
 
-app.get(fullURL('/hello'), (req, res) => {
-  res.statusCode = 200;
-  res.end('hello world!');
-});
-
-var connection = mysql.createConnection({ 
+var pool = mysql.createPool({ 
  host   : '123.56.17.42', 
  user   : 'small_seal_visitor', 
  password : 'THE_password123', 
  database : 'small_seal'
 }); 
-  
-connection.connect();
-var sql = 'SELECT * FROM small_seal_content';
-var data = '';
-connection.query(sql, function(err, rows, fields) { 
-  if (err) {
-    console.log(err);
-    return;
-  };
-  var dataString = JSON.stringify(rows);
-  data = JSON.parse(dataString);
-  // console.log('The solution is: ', data); 
-});
-app.get(fullURL('/query'), (req, res) => {
-  res.writeHead(200,{'Content-Type':'text/html;charset=utf-8'});//设置response编码为utf-8
-  // console.log('query done');
-  res.end('query');
-});
 
-connection.end(); 
+let query = function( sql, values ) {
+  return new Promise(( resolve, reject ) => {
+    pool.getConnection(function(err, connection) {
+      if (err) {
+        reject( err );
+      } else {
+        connection.query(sql, values, ( err, rows) => {
+          if ( err ) {
+            reject( err );
+          } else {
+            resolve( rows );
+          }
+          connection.release();
+        })
+      }
+    })
+  })
+}
+module.exports =  query
+
+app.get(fullURL('/query'), async (req, res) => {
+    let sql_data = await query("SELECT * FROM small_seal_content WHERE keyword LIKE '%" + req.query.keyword + "%'");
+    res.send(sql_data);
+});
 
 app.listen(port, () => {
   console.log(`Server running at ${hostname}:${port}`)
