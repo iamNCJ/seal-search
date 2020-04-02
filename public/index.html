@@ -11,7 +11,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.8/js/materialize.js"></script>
 </head>
 <body>    
-  <nav class="pink" role="navigation">
+  <nav class="red darken-3" role="navigation">
       <div class="nav-wrapper container"><a id="logo-container" class="brand-logo">NextLab</a>
         <ul class="right hide-on-med-and-down">
           <li><a href="#">Navbar Link</a></li>
@@ -34,7 +34,7 @@
 
   <div id="modal-container"></div>
 
-   <footer class="page-footer pink">     
+   <footer class="page-footer red darken-3">     
       <div class="container">
         <div class="row">
           <div class="col l6 s12">
@@ -153,6 +153,9 @@ html, body {
   display: flex;
   flex-direction: column;
 }
+body {
+  background-image: url(img/bg.jpg);
+}
 footer {
   margin-top: auto;
 }
@@ -167,6 +170,7 @@ footer {
 }
 
 .box {
+  background: white;
   display: inline-block;
   justify-content: center;
   align-items: center;
